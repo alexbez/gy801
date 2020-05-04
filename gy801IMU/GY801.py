@@ -1,10 +1,13 @@
-#!/usr/bin/python3
+# Ported to micropython from gborgonovo's library
 
-import smbus
+from machine import Pin, I2C
 import time
 from math import *
 
-bus = smbus.SMBus(1);			# 0 for R-Pi Rev. 1, 1 for Rev. 2
+SCL_PIN = 22
+SDA_PIN = 21
+
+bus = I2C(scl=Pin(SCL_PIN), sda=Pin(SDA_PIN))
 
 # General constants
 EARTH_GRAVITY_MS2	= 9.80665 # m/s2
@@ -495,38 +498,50 @@ if __name__ == "__main__":
 	
 	sensors = gy801()
 	adxl345 = sensors.accel
+ 
+    gx = adxl345.getX()
+    gy = adxl345.getY()
+    gz = adxl345.getZ()
+    
+    pitch = adxl345.getPitch()
+    roll = adxl345.getRoll()
 	
 	print ("\033[1;34;40mADXL345 on address 0x%x:" % (ADXL345_ADDRESS))
-	print ("   x = %.3f m/s2" % ( adxl345.getX() ))
-	print ("   y = %.3f m/s2" % ( adxl345.getY() ))
-	print ("   z = %.3f m/s2" % ( adxl345.getZ() ))
+	print ("   x = %.3f m/s2" % ( gx ))
+	print ("   y = %.3f m/s2" % ( gy ))
+	print ("   z = %.3f m/s2" % ( gz ))
 	print ("   x = %.3fG" % ( adxl345.Xg ))
 	print ("   y = %.3fG" % ( adxl345.Yg ))
 	print ("   z = %.3fG" % ( adxl345.Zg ))
 	print ("   x = %.3f" % ( adxl345.Xraw ))
 	print ("   y = %.3f" % ( adxl345.Yraw ))
 	print ("   z = %.3f" % ( adxl345.Zraw ))
-	print ("   pitch = %.3f" % ( adxl345.getPitch() ))
-	print ("   roll = %.3f" % ( adxl345.getRoll() ))
+	print ("   pitch = %.3f" % ( pitch ))
+	print ("   roll = %.3f" % ( roll ))
 
 	gyro = sensors.gyro
 	
-	gyro.getXangle()
-	gyro.getYangle()
-	gyro.getZangle()
+	xangle = gyro.getXangle()
+	yangle = gyro.getYangle()
+	zangle = gyro.getZangle()
     
 	print ("\033[1;33;40mL3G4200D on address 0x%x:" % (L3G4200D_ADDRESS))
-	print ("   Xangle = %.3f deg" % ( gyro.getXangle() ))
-	print ("   Yangle = %.3f deg" % ( gyro.getYangle() ))
-	print ("   Zangle = %.3f deg" % ( gyro.getZangle() ))
+	print ("   Xangle = %.3f deg" % ( xangle ))
+	print ("   Yangle = %.3f deg" % ( yangle ))
+	print ("   Zangle = %.3f deg" % ( zangle ))
 
 	compass = sensors.compass
+ 
+    x = compass.getX()
+    y = compass.getY()
+    z = compass.getZ()
+    angle = compass.getAngle()
     
 	print ("\033[1;32;40mHMC5883L on address 0x%x:" % (HMC5883L_ADDRESS))
-	print ("   X = %.3f " % ( compass.getX() ))
-	print ("   Y = %.3f " % ( compass.getY() ))
-	print ("   Z = %.3f " % ( compass.getZ() ))
-	print ("   Angle = %.3f deg" % ( compass.getAngle() ))
+	print ("   X = %.3f " % ( x ))
+	print ("   Y = %.3f " % ( y ))
+	print ("   Z = %.3f " % ( z ))
+	print ("   Angle = %.3f deg" % ( angle ))
 
 	barometer = sensors.baro
 	
